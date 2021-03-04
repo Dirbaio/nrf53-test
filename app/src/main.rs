@@ -24,6 +24,11 @@ fn main() -> ! {
 
     let p = pac::Peripherals::take().unwrap();
 
+    p.CACHE_S.enable.write(|w| w.enable().enabled());
+
+    p.CLOCK_S.hfclkctrl.write(|w| w.hclk().div1());
+    //p.CLOCK_S.hfclksrc.write(|w| w.src().hfxo());
+
     if !p.UICR_S.approtect.read().pall().is_unprotected() {
         info!("Setting UICR.APPROTECT=Unprotected");
         p.NVMC_S.config.write(|w| w.wen().wen());
