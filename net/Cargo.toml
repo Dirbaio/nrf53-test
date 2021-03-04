@@ -1,0 +1,27 @@
+[package]
+authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
+edition = "2018"
+name = "nrf53-net"
+version = "0.1.0"
+
+[features]
+default = [
+    "defmt-default",
+]
+defmt-default = []
+defmt-trace = []
+defmt-debug = []
+defmt-info = []
+defmt-warn = []
+defmt-error = []
+
+
+[dependencies]
+defmt = "0.2.0"
+defmt-rtt = "0.2.0"
+panic-probe = "0.1.0"
+
+cortex-m = { version = "0.7.1", features = ["inline-asm"] }
+cortex-m-rt = "0.6.13"
+nrf5340-net-pac = { path = "../../nrf5340-pac/nrf5340-net-pac"}
+
