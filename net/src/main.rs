@@ -2,7 +2,6 @@
 #![no_main]
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use cortex_m::asm::delay;
 use cortex_m_rt::entry;
 use defmt::*;
 use defmt_rtt as _; // global logger
@@ -40,9 +39,9 @@ fn main() -> ! {
 
     p.P0_NS.pin_cnf[29].write(|w| w.dir().output());
     loop {
+        p.P0_NS.outclr.write(|w| w.pin29().clear());
         cortex_m::asm::delay(10_000_000);
         p.P0_NS.outset.write(|w| w.pin29().set());
         cortex_m::asm::delay(10_000_000);
-        p.P0_NS.outclr.write(|w| w.pin29().clear());
     }
 }

@@ -2,7 +2,6 @@
 #![no_main]
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use cortex_m::asm::delay;
 use cortex_m_rt::entry;
 use defmt::*;
 use defmt_rtt as _; // global logger
@@ -56,53 +55,21 @@ fn main() -> ! {
         .disable
         .write(|w| unsafe { w.bits(0x50FA50FA) });
 
+    p.SPU_S.periphid[66]
+        .perm
+        .write(|w| w.secattr().non_secure());
+    p.SPU_S.gpioport[0].perm.write(|w| unsafe { w.bits(0) });
+
+    p.P0_S.pin_cnf[29].write(|w| w.mcusel().network_mcu());
+
     // Boot network core
     p.RESET_S.network.forceoff.write(|w| w.forceoff().release());
 
-    p.P0_S.pin_cnf[28].write(|w| w.dir().output());
-    p.P0_S.pin_cnf[29].write(|w| w.dir().output());
-    p.P0_S.pin_cnf[30].write(|w| w.dir().output());
-    p.P0_S.pin_cnf[31].write(|w| w.dir().output());
-
+    p.P0_NS.pin_cnf[28].write(|w| w.dir().output());
     loop {
-        p.P0_S.out.write(|w| {
-            w.pin28().low();
-            w.pin29().high();
-            w.pin30().high();
-            w.pin31().high();
-            w
-        });
-
+        p.P0_NS.outclr.write(|w| w.pin28().clear());
         cortex_m::asm::delay(10_000_000);
-
-        p.P0_S.out.write(|w| {
-            w.pin28().high();
-            w.pin29().low();
-            w.pin30().high();
-            w.pin31().high();
-            w
-        });
-
-        cortex_m::asm::delay(10_000_000);
-
-        p.P0_S.out.write(|w| {
-            w.pin28().high();
-            w.pin29().high();
-            w.pin30().low();
-            w.pin31().high();
-            w
-        });
-
-        cortex_m::asm::delay(10_000_000);
-
-        p.P0_S.out.write(|w| {
-            w.pin28().high();
-            w.pin29().high();
-            w.pin30().high();
-            w.pin31().low();
-            w
-        });
-
+        p.P0_NS.outset.write(|w| w.pin28().set());
         cortex_m::asm::delay(10_000_000);
     }
 }
